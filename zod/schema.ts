@@ -16,7 +16,7 @@ const AiResponseFormat = z.object({
 
         category : z.enum(["Greeting" , "Active Listening" , "Information Gathering" , "Objection Handling & Problem Solving" , "Closing" , "Communication Skills"]).describe("There are all the categories"), 
 
-        score : z.int().max(5).min(0).describe("Ranges bettween 0 to 5"), 
+        score : z.number().max(5).min(0).describe("Ranges bettween 0 to 5"), 
         
         evidence : z.string().describe(" (specific quotes or moments from the transcript)"), 
 
@@ -30,8 +30,8 @@ const AiResponseFormat = z.object({
 
         weightedTotalScore : z.object({
             
-            percentage : z.int().min(0).max(100).describe("in percentage"), 
-            totalScore : z.int().max(425).min(0).describe("score ranges between 0 to 425")
+            percentage : z.number().min(0).max(100).describe("in percentage"), 
+            totalScore : z.number().max(425).min(0).describe("score ranges between 0 to 425")
 
         }).describe("overall score")
 
