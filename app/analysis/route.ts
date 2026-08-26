@@ -44,17 +44,13 @@ export async function POST ( req : NextRequest ) {
         
     }
 
-    // const cloudRes = await uploadImage(data.data.audio) 
-
-    // console.log("Cloud Url :" , cloudRes?.url)
+    const cloudRes = await uploadImage(data.data.audio) 
     
-    // if(!cloudRes)return
-
-    // console.log("Cloud Url :" , cloudRes?.url)
+    if(!cloudRes)return
     
     const transcript = await client.transcripts.transcribe({
 
-        audio_url : "https://res.cloudinary.com/dknwd3sez/video/upload/v1787682527/user-uploads/lsozwewwk7fn2fiont8l.mp3", // cloudRes.url,
+        audio_url : cloudRes.url,
         speaker_labels : true,
         sentiment_analysis : true,
         
