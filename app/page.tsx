@@ -165,6 +165,7 @@ export default function Page() {
   const [question, setQuestion] = useState("");
   const [sent, setSent] = useState(false);
   const [additionalChecks, setAdditionalChecks] = useState("");
+  const [sampleLoading, setSampleLoading] = useState(false);
   const choose = (f?: File) => {
     if (f?.type.startsWith("audio/")) {
       setFile(f);
@@ -174,17 +175,32 @@ export default function Page() {
     }
   };
   const sample = async () => {
-
-    const blob = await fetch(sampleAudio).then((response) => response.blob());
-   
-    const sampleFile = new File([blob], "sample-scheduler-call.wav", {
-      type: "audio/wav",
-   
-    });
-    setFile(sampleFile);
-    setUrl(URL.createObjectURL(blob));
-    setResults(false);
+    setSampleLoading(true);
     setError("");
+
+    try {
+      const response = await fetch(sampleAudio);
+
+      if (!response.ok) {
+        throw new Error(`Sample audio failed to load (${response.status})`);
+      }
+
+      const blob = await response.blob();
+      const sampleFile = new File([blob], "sample-scheduler-call.wav", {
+        type: "audio/wav",
+      });
+      setFile(sampleFile);
+      setUrl(URL.createObjectURL(blob));
+      setResults(false);
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "Unable to load the sample audio.",
+      );
+    } finally {
+      setSampleLoading(false);
+    }
   };
   const analyze = async () => {
 
@@ -248,6 +264,7 @@ export default function Page() {
     setUrl("");
     setResults(false);
     setPlaying(false);
+    setSampleLoading(false);
   };
   return (
     <main className="page-shell">
@@ -382,8 +399,17 @@ export default function Page() {
               )}
               <div className="sample-row">
                 <span>See the full analysis flow</span>
-                <button onClick={sample}>
-                  Use sample call <ArrowUpRight size={13} />
+                <button onClick={sample} disabled={sampleLoading || !!file}>
+                  {sampleLoading ? (
+                    <>
+                      <Loader2 size={13} className="spin" /> Loading sample
+                      audio…
+                    </>
+                  ) : (
+                    <>
+                      Use sample call <ArrowUpRight size={13} />
+                    </>
+                  )}
                 </button>
               </div>
               <div className="additional-checks">
